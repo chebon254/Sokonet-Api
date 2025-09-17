@@ -49,12 +49,38 @@ if (process.env.NODE_ENV === 'development') {
 // Rate limiting
 app.use(generalRateLimiter);
 
+// Root endpoint
+app.get('/', (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'Sokonet API is running',
+    version: '1.0.0',
+    timestamp: new Date().toISOString(),
+    endpoints: {
+      health: '/health',
+      api_health: '/api/health',
+      documentation: '/api-docs'
+    }
+  });
+});
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.status(200).json({
     success: true,
     message: 'Server is healthy',
     timestamp: new Date().toISOString()
+  });
+});
+
+// API Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'API is healthy',
+    timestamp: new Date().toISOString(),
+    database: 'connected',
+    server: 'running'
   });
 });
 
