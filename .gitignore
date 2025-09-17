@@ -17,6 +17,8 @@ yarn-error.log*
 # Database
 *.sqlite
 *.sqlite3
+tool.py
+debug.txt
 
 # IDE
 .vscode/
@@ -37,8 +39,6 @@ build/
 # Uploads (local)
 uploads/
 
-# Prisma
-prisma/migrations/dev/
 
 # Temporary files
 tmp/

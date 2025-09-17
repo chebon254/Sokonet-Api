@@ -17,7 +17,7 @@ A comprehensive restaurant management system API with QR code-based ordering, pa
 
 - **Runtime**: Node.js (Latest LTS)
 - **Framework**: Express.js 4.18.2
-- **Database**: MySQL with Sequelize ORM and Prisma
+- **Database**: MySQL with Sequelize ORM
 - **Authentication**: JWT tokens with refresh token mechanism
 - **File Storage**: DigitalOcean Spaces (S3-compatible)
 - **Payment**: Pesapal integration for card/M-Pesa payments
