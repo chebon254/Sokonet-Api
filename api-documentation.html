@@ -1,0 +1,1615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sokonet API Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+            margin-bottom: 30px;
+            border-radius: 10px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .nav {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .nav h3 {
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        .nav ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .nav a {
+            color: #667eea;
+            text-decoration: none;
+            padding: 8px 15px;
+            border: 1px solid #667eea;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        .nav a:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .section {
+            background: white;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .section-header {
+            background: #667eea;
+            color: white;
+            padding: 20px;
+        }
+
+        .section-header h2 {
+            font-size: 1.8em;
+        }
+
+        .section-content {
+            padding: 20px;
+        }
+
+        .endpoint {
+            border: 1px solid #e1e5e9;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .endpoint-header {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e1e5e9;
+        }
+
+        .method {
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-right: 15px;
+            font-size: 0.9em;
+        }
+
+        .method.get { background: #d4edda; color: #155724; }
+        .method.post { background: #cce7ff; color: #004085; }
+        .method.put { background: #fff3cd; color: #856404; }
+        .method.patch { background: #f8d7da; color: #721c24; }
+        .method.delete { background: #f5c6cb; color: #721c24; }
+
+        .endpoint-url {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            color: #495057;
+        }
+
+        .endpoint-description {
+            margin-left: auto;
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        .endpoint-body {
+            padding: 20px;
+        }
+
+        .endpoint-body h4 {
+            color: #495057;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #e1e5e9;
+            padding-bottom: 5px;
+        }
+
+        .code-block {
+            background: #f8f9fa;
+            border: 1px solid #e1e5e9;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+        }
+
+        .auth-required {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 0.9em;
+        }
+
+        .auth-required strong {
+            color: #856404;
+        }
+
+        .parameter {
+            margin: 8px 0;
+            padding: 8px;
+            background: #f8f9fa;
+            border-left: 3px solid #667eea;
+        }
+
+        .parameter-name {
+            font-weight: bold;
+            color: #495057;
+        }
+
+        .parameter-type {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .required {
+            color: #dc3545;
+            font-size: 0.8em;
+        }
+
+        .base-url {
+            background: #e3f2fd;
+            border: 1px solid #bbdefb;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .base-url h3 {
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+
+        .status-codes {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .status-code {
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        .status-200 { background: #d4edda; color: #155724; }
+        .status-201 { background: #d1ecf1; color: #0c5460; }
+        .status-400 { background: #f8d7da; color: #721c24; }
+        .status-401 { background: #f5c6cb; color: #721c24; }
+        .status-404 { background: #f8d7da; color: #721c24; }
+        .status-500 { background: #f5c6cb; color: #721c24; }
+
+        .toc {
+            position: sticky;
+            top: 20px;
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        @media (max-width: 768px) {
+            .nav ul {
+                flex-direction: column;
+            }
+
+            .endpoint-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .endpoint-description {
+                margin-left: 0;
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🍽️ Sokonet API Documentation</h1>
+            <p>Complete Restaurant Management System API</p>
+            <p><strong>Version:</strong> 1.0.0 | <strong>Server:</strong> http://localhost:3000</p>
+        </div>
+
+        <div class="base-url">
+            <h3>🌐 Base URL</h3>
+            <div class="code-block">http://localhost:3000/api</div>
+            <p><strong>Health Check:</strong> <code>GET /health</code></p>
+        </div>
+
+        <div class="nav">
+            <h3>📖 Quick Navigation</h3>
+            <ul>
+                <li><a href="#authentication">Authentication</a></li>
+                <li><a href="#business">Business Management</a></li>
+                <li><a href="#products">Products & Categories</a></li>
+                <li><a href="#qr-codes">QR Codes</a></li>
+                <li><a href="#uploads">File Uploads</a></li>
+                <li><a href="#orders">Order Management</a></li>
+                <li><a href="#payments">Payment Processing</a></li>
+                <li><a href="#environment">Environment Setup</a></li>
+            </ul>
+        </div>
+
+        <!-- Authentication Section -->
+        <div class="section" id="authentication">
+            <div class="section-header">
+                <h2>🔐 Authentication & Authorization</h2>
+            </div>
+            <div class="section-content">
+                <p>JWT-based authentication with role-based access control. Roles: <code>user</code>, <code>business</code>, <code>admin</code>, <code>dispatcher</code>, <code>scanner</code></p>
+
+                <!-- User Registration -->
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method post">POST</span>
+                        <span class="endpoint-url">/auth/register</span>
+                        <span class="endpoint-description">Register new user or business</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <h4>Request Body</h4>
+                        <div class="parameter">
+                            <span class="parameter-name">name</span> <span class="parameter-type">string</span> <span class="required">*required</span><br>
+                            Full name of the user or business
+                        </div>
+                        <div class="parameter">
+                            <span class="parameter-name">email</span> <span class="parameter-type">string</span> <span class="required">*required</span><br>
+                            Valid email address
+                        </div>
+                        <div class="parameter">
+                            <span class="parameter-name">password</span> <span class="parameter-type">string</span> <span class="required">*required</span><br>
+                            Minimum 8 characters
+                        </div>
+                        <div class="parameter">
+                            <span class="parameter-name">role</span> <span class="parameter-type">string</span> <span class="required">*required</span><br>
+                            One of: user, business, admin, dispatcher, scanner
+                        </div>
+                        <div class="parameter">
+                            <span class="parameter-name">phone</span> <span class="parameter-type">string</span><br>
+                            Phone number (optional)
+                        </div>
+
+                        <h4>Example Request</h4>
+                        <div class="code-block">{
+  "name": "Pizza Palace",
+  "email": "admin@pizzapalace.com",
+  "password": "securepass123",
+  "role": "business",
+  "phone": "+254700000000"
+}</div>
+
+                        <h4>Response</h4>
+                        <div class="status-codes">
+                            <div class="status-code status-201">201 Created</div>
+                            <div class="status-code status-400">400 Validation Error</div>
+                        </div>
+                        <div class="code-block">{
+  "success": true,
+  "message": "Registration successful",
+  "data": {
+    "user": {
+      "id": 1,
+      "name": "Pizza Palace",
+      "email": "admin@pizzapalace.com",
+      "role": "business"
+    },
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  }
+}</div>
+                    </div>
+                </div>
+
+                <!-- Login -->
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method post">POST</span>
+                        <span class="endpoint-url">/auth/login</span>
+                        <span class="endpoint-description">User/Business login</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <h4>Request Body</h4>
+                        <div class="parameter">
+                            <span class="parameter-name">email</span> <span class="parameter-type">string</span> <span class="required">*required</span>
+                        </div>
+                        <div class="parameter">
+                            <span class="parameter-name">password</span> <span class="parameter-type">string</span> <span class="required">*required</span>
+                        </div>
+
+                        <h4>Example Request</h4>
+                        <div class="code-block">{
+  "email": "admin@pizzapalace.com",
+  "password": "securepass123"
+}</div>
+
+                        <h4>Response</h4>
+                        <div class="code-block">{
+  "success": true,
+  "message": "Login successful",
+  "data": {
+    "user": {
+      "id": 1,
+      "name": "Pizza Palace",
+      "email": "admin@pizzapalace.com",
+      "role": "business"
+    },
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  }
+}</div>
+                    </div>
+                </div>
+
+                <!-- Verify Email -->
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method post">POST</span>
+                        <span class="endpoint-url">/auth/verify-email</span>
+                        <span class="endpoint-description">Verify email address</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <h4>Request Body</h4>
+                        <div class="parameter">
+                            <span class="parameter-name">token</span> <span class="parameter-type">string</span> <span class="required">*required</span><br>
+                            Email verification token
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Forgot Password -->
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method post">POST</span>
+                        <span class="endpoint-url">/auth/forgot-password</span>
+                        <span class="endpoint-description">Request password reset</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <h4>Request Body</h4>
+                        <div class="parameter">
+                            <span class="parameter-name">email</span> <span class="parameter-type">string</span> <span class="required">*required</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Business Management Section -->
+        <div class="section" id="business">
+            <div class="section-header">
+                <h2>🏢 Business Management</h2>
+            </div>
+            <div class="section-content">
+                <div class="auth-required">
+                    <strong>🔒 Authentication Required:</strong> Bearer token with 'business' role
+                </div>
+
+                <!-- Get Business Profile -->
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method get">GET</span>
+                        <span class="endpoint-url">/business/profile</span>
+                        <span class="endpoint-description">Get business profile</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <h4>Headers</h4>
+                        <div class="code-block">Authorization: Bearer YOUR_JWT_TOKEN</div>
+
+                        <h4>Response</h4>
+                        <div class="code-block">{
+  "success": true,
+  "message": "Business profile retrieved",
+  "data": {
+    "business": {
+      "id": 1,
+      "name": "Pizza Palace",
+      "email": "admin@pizzapalace.com",
+      "phone": "+254700000000",
+      "address": "123 Main St, Nairobi",
+      "description": "Best pizza in town",
+      "logo": "https://spaces.url/logo.png",
+      "isActive": true,
+      "createdAt": "2024-01-01T00:00:00.000Z"
+    }
+  }
+}</div>
+                    </div>
+                </div>
+
+                <!-- Update Business Profile -->
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method put">PUT</span>
+                        <span class="endpoint-url">/business/profile</span>
+                        <span class="endpoint-description">Update business profile</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <h4>Request Body</h4>
+                        <div class="parameter">
+                            <span class="parameter-name">name</span> <span class="parameter-type">string</span><br>
+                            Business name
+                        </div>
+                        <div class="parameter">
+                            <span class="parameter-name">phone</span> <span class="parameter-type">string</span><br>
+                            Contact phone
+                        </div>
+                        <div class="parameter">
+                            <span class="parameter-name">address</span> <span class="parameter-type">string</span><br>
+                            Business address
+                        </div>
+                        <div class="parameter">
+                            <span class="parameter-name">description</span> <span class="parameter-type">string</span><br>
+                            Business description
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Business Stats -->
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method get">GET</span>
+                        <span class="endpoint-url">/business/stats</span>
+                        <span class="endpoint-description">Get business analytics</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <h4>Response</h4>
+                        <div class="code-block">{
+  "success": true,
+  "data": {
+    "totalProducts": 25,
+    "totalOrders": 150,
+    "totalRevenue": 45000,
+    "activeQRCodes": 50,
+    "monthlyGrowth": 15.5
+  }
+}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Products Section -->
+        <div class="section" id="products">
+            <div class="section-header">
+                <h2>📦 Products & Categories</h2>
+            </div>
+            <div class="section-content">
+                <div class="auth-required">
+                    <strong>🔒 Authentication Required:</strong> Bearer token with 'business' role
+                </div>
+
+                <!-- Get Products -->
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method get">GET</span>
+                        <span class="endpoint-url">/products</span>
+                        <span class="endpoint-description">Get products with pagination</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <h4>Query Parameters</h4>
+                        <div class="parameter">
+                            <span class="parameter-name">page</span> <span class="parameter-type">number</span><br>
+                            Page number (default: 1)
+                        </div>
+                        <div class="parameter">
+                            <span class="parameter-name">limit</span> <span class="parameter-type">number</span><br>
+                            Items per page (default: 20)
+                        </div>
+                        <div class="parameter">
+                            <span class="parameter-name">search</span> <span class="parameter-type">string</span><br>
+                            Search term
+                        </div>
+                        <div class="parameter">
+                            <span class="parameter-name">categoryId</span> <span class="parameter-type">number</span><br>
+                            Filter by category
+                        </div>
+
+                        <h4>Example Request</h4>
+                        <div class="code-block">GET /api/products?page=1&limit=10&search=pizza&categoryId=1</div>
+
+                        <h4>Response</h4>
+                        <div class="code-block">{
+  "success": true,
+  "data": {
+    "products": [
+      {
+        "id": 1,
+        "name": "Margherita Pizza",
+        "description": "Classic pizza with tomato and mozzarella",
+        "price": 1200,
+        "stock": 50,
+        "categoryId": 1,
+        "image": "https://spaces.url/pizza.jpg",
+        "isActive": true,
+        "Category": {
+          "id": 1,
+          "name": "Pizzas"
+        }
+      }
+    ],
+    "pagination": {
+      "current": 1,
+      "total": 5,
+      "count": 25,
+      "perPage": 10
+    }
+  }
+}</div>
+                    </div>
+                </div>
+
+                <!-- Create Product -->
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method post">POST</span>
+                        <span class="endpoint-url">/products</span>
+                        <span class="endpoint-description">Create new product</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <h4>Request Body</h4>
+                        <div class="parameter">
+                            <span class="parameter-name">name</span> <span class="parameter-type">string</span> <span class="required">*required</span><br>
+                            Product name
+                        </div>
+                        <div class="parameter">
+                            <span class="parameter-name">description</span> <span class="parameter-type">string</span><br>
+                            Product description
+                        </div>
+                        <div class="parameter">
+                            <span class="parameter-name">price</span> <span class="parameter-type">number</span> <span class="required">*required</span><br>
+                            Price in cents (KES)
+                        </div>
+                        <div class="parameter">
+                            <span class="parameter-name">stock</span> <span class="parameter-type">number</span> <span class="required">*required</span><br>
+                            Initial stock quantity
+                        </div>
+                        <div class="parameter">
+                            <span class="parameter-name">categoryId</span> <span class="parameter-type">number</span> <span class="required">*required</span><br>
+                            Category ID
+                        </div>
+
+                        <h4>Example Request</h4>
+                        <div class="code-block">{
+  "name": "Pepperoni Pizza",
+  "description": "Pizza with pepperoni and cheese",
+  "price": 1500,
+  "stock": 30,
+  "categoryId": 1
+}</div>
+                    </div>
+                </div>
+
+                <!-- Update Stock -->
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method patch">PATCH</span>
+                        <span class="endpoint-url">/products/:id/stock</span>
+                        <span class="endpoint-description">Update product stock</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <h4>Request Body</h4>
+                        <div class="parameter">
+                            <span class="parameter-name">stock</span> <span class="parameter-type">number</span> <span class="required">*required</span><br>
+                            New stock quantity
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Get Categories -->
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method get">GET</span>
+                        <span class="endpoint-url">/products/categories</span>
+                        <span class="endpoint-description">Get all categories</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <h4>Response</h4>
+                        <div class="code-block">{
+  "success": true,
+  "data": {
+    "categories": [
+      {
+        "id": 1,
+        "name": "Pizzas",
+        "description": "All types of pizzas",
+        "image": "https://spaces.url/pizza-category.jpg",
+        "isActive": true,
+        "productCount": 15
+      }
+    ]
+  }
+}</div>
+                    </div>
+                </div>
+
+                <!-- Create Category -->
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method post">POST</span>
+                        <span class="endpoint-url">/products/categories</span>
+                        <span class="endpoint-description">Create new category</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <h4>Request Body</h4>
+                        <div class="parameter">
+                            <span class="parameter-name">name</span> <span class="parameter-type">string</span> <span class="required">*required</span><br>
+                            Category name
+                        </div>
+                        <div class="parameter">
+                            <span class="parameter-name">description</span> <span class="parameter-type">string</span><br>
+                            Category description
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- QR Codes Section -->
+        <div class="section" id="qr-codes">
+            <div class="section-header">
+                <h2>📱 QR Code Management</h2>
+            </div>
+            <div class="section-content">
+                <div class="auth-required">
+                    <strong>🔒 Authentication Required:</strong> Bearer token with 'business' role
+                </div>
+
+                <!-- Generate QR Codes -->
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method post">POST</span>
+                        <span class="endpoint-url">/qr/generate</span>
+                        <span class="endpoint-description">Generate QR codes in bulk</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <h4>Request Body</h4>
+                        <div class="parameter">
+                            <span class="parameter-name">quantity</span> <span class="parameter-type">number</span><br>
+                            Number of QR codes to generate (1-100, default: 1)
+                        </div>
+
+                        <h4>Example Request</h4>
+                        <div class="code-block">{
+  "quantity": 10
+}</div>
+
+                        <h4>Response</h4>
+                        <div class="code-block">{
+  "success": true,
+  "message": "10 QR codes generated successfully",
+  "data": {
+    "qrCodes": [
+      {
+        "id": 1,
+        "code": "ABC12345",
+        "imageUrl": "https://spaces.url/qr_ABC12345.png",
+        "isActive": true,
+        "createdAt": "2024-01-01T00:00:00.000Z"
+      }
+    ],
+    "count": 10
+  }
+}</div>
+                    </div>
+                </div>
+
+                <!-- Get QR Codes -->
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method get">GET</span>
+                        <span class="endpoint-url">/qr</span>
+                        <span class="endpoint-description">Get QR codes with filters</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <h4>Query Parameters</h4>
+                        <div class="parameter">
+                            <span class="parameter-name">page</span> <span class="parameter-type">number</span><br>
+                            Page number
+                        </div>
+                        <div class="parameter">
+                            <span class="parameter-name">limit</span> <span class="parameter-type">number</span><br>
+                            Items per page
+                        </div>
+                        <div class="parameter">
+                            <span class="parameter-name">search</span> <span class="parameter-type">string</span><br>
+                            Search by QR code
+                        </div>
+                        <div class="parameter">
+                            <span class="parameter-name">isActive</span> <span class="parameter-type">boolean</span><br>
+                            Filter by active status
+                        </div>
+                        <div class="parameter">
+                            <span class="parameter-name">isAssigned</span> <span class="parameter-type">boolean</span><br>
+                            Filter by assignment status
+                        </div>
+                        <div class="parameter">
+                            <span class="parameter-name">isPrinted</span> <span class="parameter-type">boolean</span><br>
+                            Filter by printed status
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Assign QR Code -->
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method patch">PATCH</span>
+                        <span class="endpoint-url">/qr/:id/assign</span>
+                        <span class="endpoint-description">Assign QR code to user</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <h4>Request Body</h4>
+                        <div class="parameter">
+                            <span class="parameter-name">userId</span> <span class="parameter-type">number</span> <span class="required">*required</span><br>
+                            User ID to assign the QR code to
+                        </div>
+
+                        <h4>Example Request</h4>
+                        <div class="code-block">{
+  "userId": 123
+}</div>
+                    </div>
+                </div>
+
+                <!-- Generate PDF -->
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method post">POST</span>
+                        <span class="endpoint-url">/qr/pdf</span>
+                        <span class="endpoint-description">Generate printable QR codes PDF</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <h4>Request Body</h4>
+                        <div class="parameter">
+                            <span class="parameter-name">qrCodeIds</span> <span class="parameter-type">array</span> <span class="required">*required</span><br>
+                            Array of QR code IDs (max 50)
+                        </div>
+                        <div class="parameter">
+                            <span class="parameter-name">codesPerRow</span> <span class="parameter-type">number</span><br>
+                            QR codes per row (default: 4)
+                        </div>
+                        <div class="parameter">
+                            <span class="parameter-name">includeCodeText</span> <span class="parameter-type">boolean</span><br>
+                            Include code text below QR (default: true)
+                        </div>
+                        <div class="parameter">
+                            <span class="parameter-name">includeBusinessHeader</span> <span class="parameter-type">boolean</span><br>
+                            Include business header (default: true)
+                        </div>
+
+                        <h4>Example Request</h4>
+                        <div class="code-block">{
+  "qrCodeIds": [1, 2, 3, 4, 5],
+  "codesPerRow": 3,
+  "includeCodeText": true,
+  "includeBusinessHeader": true
+}</div>
+
+                        <h4>Response</h4>
+                        <div class="code-block">{
+  "success": true,
+  "message": "Printable PDF generated successfully",
+  "data": {
+    "pdfUrl": "https://spaces.url/qr-codes-1234567890.pdf",
+    "qrCodeCount": 5,
+    "filename": "qr-codes-1234567890.pdf"
+  }
+}</div>
+                    </div>
+                </div>
+
+                <!-- QR Stats -->
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method get">GET</span>
+                        <span class="endpoint-url">/qr/stats</span>
+                        <span class="endpoint-description">Get QR code statistics</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <h4>Response</h4>
+                        <div class="code-block">{
+  "success": true,
+  "data": {
+    "totalQRCodes": 100,
+    "assignedQRCodes": 75,
+    "unassignedQRCodes": 25,
+    "printedQRCodes": 80,
+    "unprintedQRCodes": 20,
+    "activeQRCodes": 95,
+    "totalScans": 1250,
+    "avgScansPerCode": "12.50"
+  }
+}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- File Uploads Section -->
+        <div class="section" id="uploads">
+            <div class="section-header">
+                <h2>☁️ File Upload Management</h2>
+            </div>
+            <div class="section-content">
+                <div class="auth-required">
+                    <strong>🔒 Authentication Required:</strong> Bearer token with 'business' role
+                </div>
+
+                <!-- Single File Upload -->
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method post">POST</span>
+                        <span class="endpoint-url">/upload/single</span>
+                        <span class="endpoint-description">Upload single file</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <h4>Content-Type</h4>
+                        <div class="code-block">multipart/form-data</div>
+
+                        <h4>Form Data</h4>
+                        <div class="parameter">
+                            <span class="parameter-name">file</span> <span class="parameter-type">file</span> <span class="required">*required</span><br>
+                            File to upload (max 10MB)
+                        </div>
+                        <div class="parameter">
+                            <span class="parameter-name">category</span> <span class="parameter-type">string</span><br>
+                            File category (default: 'general')
+                        </div>
+                        <div class="parameter">
+                            <span class="parameter-name">subfolder</span> <span class="parameter-type">string</span><br>
+                            Optional subfolder
+                        </div>
+
+                        <h4>Supported File Types</h4>
+                        <ul>
+                            <li><strong>Images:</strong> JPEG, PNG, GIF, WebP</li>
+                            <li><strong>Documents:</strong> PDF, DOC, DOCX</li>
+                            <li><strong>Spreadsheets:</strong> XLS, XLSX</li>
+                            <li><strong>Video:</strong> MP4, MPEG, MOV, AVI</li>
+                            <li><strong>Audio:</strong> MP3, WAV, OGG</li>
+                        </ul>
+
+                        <h4>Response</h4>
+                        <div class="code-block">{
+  "success": true,
+  "message": "File uploaded successfully",
+  "data": {
+    "fileUrl": "https://spaces.url/general/123/file.jpg",
+    "filename": "uuid-filename.jpg",
+    "originalName": "my-image.jpg",
+    "size": 102400,
+    "mimetype": "image/jpeg",
+    "category": "general",
+    "subfolder": ""
+  }
+}</div>
+                    </div>
+                </div>
+
+                <!-- Multiple Files Upload -->
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method post">POST</span>
+                        <span class="endpoint-url">/upload/multiple</span>
+                        <span class="endpoint-description">Upload multiple files (max 5)</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <h4>Form Data</h4>
+                        <div class="parameter">
+                            <span class="parameter-name">files</span> <span class="parameter-type">file[]</span> <span class="required">*required</span><br>
+                            Array of files (max 5 files)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Image Upload -->
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method post">POST</span>
+                        <span class="endpoint-url">/upload/product/:productId/image</span>
+                        <span class="endpoint-description">Upload product image</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <h4>Form Data</h4>
+                        <div class="parameter">
+                            <span class="parameter-name">image</span> <span class="parameter-type">file</span> <span class="required">*required</span><br>
+                            Image file only (JPEG, PNG, GIF, WebP)
+                        </div>
+
+                        <h4>Response</h4>
+                        <div class="code-block">{
+  "success": true,
+  "message": "Product image uploaded successfully",
+  "data": {
+    "imageUrl": "https://spaces.url/products/123/product_1_uuid.jpg",
+    "filename": "product_1_uuid.jpg",
+    "productId": "1",
+    "size": 102400
+  }
+}</div>
+                    </div>
+                </div>
+
+                <!-- Business Logo Upload -->
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method post">POST</span>
+                        <span class="endpoint-url">/upload/logo</span>
+                        <span class="endpoint-description">Upload business logo</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <h4>Form Data</h4>
+                        <div class="parameter">
+                            <span class="parameter-name">logo</span> <span class="parameter-type">file</span> <span class="required">*required</span><br>
+                            Logo image file
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Delete File -->
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method delete">DELETE</span>
+                        <span class="endpoint-url">/upload</span>
+                        <span class="endpoint-description">Delete uploaded file</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <h4>Request Body</h4>
+                        <div class="parameter">
+                            <span class="parameter-name">fileUrl</span> <span class="parameter-type">string</span> <span class="required">*required</span><br>
+                            URL of file to delete
+                        </div>
+
+                        <h4>Example Request</h4>
+                        <div class="code-block">{
+  "fileUrl": "https://spaces.url/general/123/file.jpg"
+}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Orders Section -->
+        <div class="section" id="orders">
+            <div class="section-header">
+                <h2>🛒 Order Management</h2>
+            </div>
+            <div class="section-content">
+                <div class="auth-required">
+                    <strong>🔒 Authentication Required:</strong> Bearer token (user role for creating, business role for management)
+                </div>
+
+                <!-- Create Order -->
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method post">POST</span>
+                        <span class="endpoint-url">/orders</span>
+                        <span class="endpoint-description">Create new order (QR-based)</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <h4>Request Body</h4>
+                        <div class="parameter">
+                            <span class="parameter-name">items</span> <span class="parameter-type">array</span> <span class="required">*required</span><br>
+                            Array of order items
+                        </div>
+                        <div class="parameter">
+                            <span class="parameter-name">qrCodeId</span> <span class="parameter-type">number</span> <span class="required">*required</span><br>
+                            QR code ID (must be assigned to user)
+                        </div>
+                        <div class="parameter">
+                            <span class="parameter-name">paymentMethod</span> <span class="parameter-type">string</span><br>
+                            Payment method (default: 'cash')
+                        </div>
+                        <div class="parameter">
+                            <span class="parameter-name">deliveryAddress</span> <span class="parameter-type">string</span><br>
+                            Delivery address
+                        </div>
+                        <div class="parameter">
+                            <span class="parameter-name">notes</span> <span class="parameter-type">string</span><br>
+                            Order notes
+                        </div>
+
+                        <h4>Order Item Structure</h4>
+                        <div class="code-block">{
+  "productId": 1,
+  "quantity": 2,
+  "price": 1200  // Optional, will use current product price if not provided
+}</div>
+
+                        <h4>Example Request</h4>
+                        <div class="code-block">{
+  "items": [
+    {
+      "productId": 1,
+      "quantity": 2
+    },
+    {
+      "productId": 3,
+      "quantity": 1
+    }
+  ],
+  "qrCodeId": 15,
+  "paymentMethod": "card",
+  "deliveryAddress": "123 Main St, Nairobi",
+  "notes": "Extra spicy"
+}</div>
+
+                        <h4>Response</h4>
+                        <div class="code-block">{
+  "success": true,
+  "message": "Order created successfully",
+  "data": {
+    "order": {
+      "id": 1,
+      "totalAmount": 3600,
+      "status": "pending",
+      "paymentStatus": "pending",
+      "createdAt": "2024-01-01T00:00:00.000Z"
+    },
+    "items": 2,
+    "qrCode": "ABC12345"
+  }
+}</div>
+                    </div>
+                </div>
+
+                <!-- Get Orders -->
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method get">GET</span>
+                        <span class="endpoint-url">/orders</span>
+                        <span class="endpoint-description">Get orders with filters</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <h4>Query Parameters</h4>
+                        <div class="parameter">
+                            <span class="parameter-name">page</span> <span class="parameter-type">number</span><br>
+                            Page number
+                        </div>
+                        <div class="parameter">
+                            <span class="parameter-name">limit</span> <span class="parameter-type">number</span><br>
+                            Items per page
+                        </div>
+                        <div class="parameter">
+                            <span class="parameter-name">status</span> <span class="parameter-type">string</span><br>
+                            Order status (pending, confirmed, preparing, ready, delivered, cancelled)
+                        </div>
+                        <div class="parameter">
+                            <span class="parameter-name">paymentStatus</span> <span class="parameter-type">string</span><br>
+                            Payment status (pending, paid, failed, refunded)
+                        </div>
+                        <div class="parameter">
+                            <span class="parameter-name">startDate</span> <span class="parameter-type">string</span><br>
+                            Start date filter (ISO format)
+                        </div>
+                        <div class="parameter">
+                            <span class="parameter-name">endDate</span> <span class="parameter-type">string</span><br>
+                            End date filter (ISO format)
+                        </div>
+
+                        <h4>Response</h4>
+                        <div class="code-block">{
+  "success": true,
+  "data": {
+    "orders": [
+      {
+        "id": 1,
+        "totalAmount": 3600,
+        "status": "confirmed",
+        "paymentStatus": "paid",
+        "deliveryAddress": "123 Main St",
+        "createdAt": "2024-01-01T00:00:00.000Z",
+        "OrderItems": [
+          {
+            "id": 1,
+            "quantity": 2,
+            "price": 1200,
+            "total": 2400,
+            "Product": {
+              "name": "Margherita Pizza",
+              "image": "https://spaces.url/pizza.jpg"
+            }
+          }
+        ],
+        "User": {
+          "name": "John Doe",
+          "email": "john@example.com",
+          "phone": "+254700000000"
+        },
+        "QRCode": {
+          "code": "ABC12345"
+        }
+      }
+    ],
+    "pagination": {
+      "current": 1,
+      "total": 10,
+      "count": 50,
+      "perPage": 20
+    }
+  }
+}</div>
+                    </div>
+                </div>
+
+                <!-- Update Order Status -->
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method patch">PATCH</span>
+                        <span class="endpoint-url">/orders/:id/status</span>
+                        <span class="endpoint-description">Update order status (business only)</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <h4>Request Body</h4>
+                        <div class="parameter">
+                            <span class="parameter-name">status</span> <span class="parameter-type">string</span> <span class="required">*required</span><br>
+                            New status: pending, confirmed, preparing, ready, delivered, cancelled
+                        </div>
+
+                        <h4>Status Transition Rules</h4>
+                        <ul>
+                            <li><strong>pending</strong> → confirmed, cancelled</li>
+                            <li><strong>confirmed</strong> → preparing, cancelled</li>
+                            <li><strong>preparing</strong> → ready, cancelled</li>
+                            <li><strong>ready</strong> → delivered</li>
+                            <li><strong>delivered</strong> → (final status)</li>
+                            <li><strong>cancelled</strong> → (final status)</li>
+                        </ul>
+
+                        <h4>Example Request</h4>
+                        <div class="code-block">{
+  "status": "confirmed"
+}</div>
+                    </div>
+                </div>
+
+                <!-- Cancel Order -->
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method patch">PATCH</span>
+                        <span class="endpoint-url">/orders/:id/cancel</span>
+                        <span class="endpoint-description">Cancel order (restores stock)</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <h4>Request Body</h4>
+                        <div class="parameter">
+                            <span class="parameter-name">reason</span> <span class="parameter-type">string</span><br>
+                            Cancellation reason
+                        </div>
+
+                        <h4>Example Request</h4>
+                        <div class="code-block">{
+  "reason": "Customer requested cancellation"
+}</div>
+                    </div>
+                </div>
+
+                <!-- Order Stats -->
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method get">GET</span>
+                        <span class="endpoint-url">/orders/stats</span>
+                        <span class="endpoint-description">Get order statistics (business only)</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <h4>Query Parameters</h4>
+                        <div class="parameter">
+                            <span class="parameter-name">period</span> <span class="parameter-type">string</span><br>
+                            Time period: week, month, year (default: week)
+                        </div>
+
+                        <h4>Response</h4>
+                        <div class="code-block">{
+  "success": true,
+  "data": {
+    "totalOrders": 150,
+    "pendingOrders": 5,
+    "completedOrders": 120,
+    "cancelledOrders": 25,
+    "totalRevenue": 180000,
+    "periodOrders": 25,
+    "period": "week"
+  }
+}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payments Section -->
+        <div class="section" id="payments">
+            <div class="section-header">
+                <h2>💳 Payment Processing (Pesapal Integration)</h2>
+            </div>
+            <div class="section-content">
+                <div class="auth-required">
+                    <strong>🔒 Authentication Required:</strong> Bearer token
+                </div>
+
+                <!-- Initiate Payment -->
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method post">POST</span>
+                        <span class="endpoint-url">/payments/initiate</span>
+                        <span class="endpoint-description">Initiate payment for order</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <h4>Request Body</h4>
+                        <div class="parameter">
+                            <span class="parameter-name">orderId</span> <span class="parameter-type">number</span> <span class="required">*required</span><br>
+                            Order ID to process payment for
+                        </div>
+
+                        <h4>Example Request</h4>
+                        <div class="code-block">{
+  "orderId": 123
+}</div>
+
+                        <h4>Response</h4>
+                        <div class="code-block">{
+  "success": true,
+  "message": "Payment initiated successfully",
+  "data": {
+    "paymentUrl": "https://cybqa.pesapal.com/pesapalv3/payment/...",
+    "trackingId": "pesapal-tracking-id",
+    "orderId": 123,
+    "amount": 3600
+  }
+}</div>
+
+                        <h4>Next Steps</h4>
+                        <p>1. Redirect user to <code>paymentUrl</code><br>
+                        2. User completes payment on Pesapal<br>
+                        3. Pesapal redirects to callback URL<br>
+                        4. Payment status is updated automatically</p>
+                    </div>
+                </div>
+
+                <!-- Payment Callback -->
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method get">GET</span>
+                        <span class="endpoint-url">/payments/callback</span>
+                        <span class="endpoint-description">Payment callback (Pesapal redirect)</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p><strong>⚠️ This endpoint is called automatically by Pesapal</strong></p>
+                        <p>After payment completion, Pesapal redirects the user to this endpoint with payment details. The system automatically:</p>
+                        <ul>
+                            <li>Verifies payment status with Pesapal</li>
+                            <li>Updates order payment status</li>
+                            <li>Creates transaction record</li>
+                            <li>Redirects user to success/failure page</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Verify Payment -->
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method get">GET</span>
+                        <span class="endpoint-url">/payments/verify</span>
+                        <span class="endpoint-description">Verify payment status</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <h4>Query Parameters</h4>
+                        <div class="parameter">
+                            <span class="parameter-name">trackingId</span> <span class="parameter-type">string</span><br>
+                            Pesapal tracking ID
+                        </div>
+                        <div class="parameter">
+                            <span class="parameter-name">orderId</span> <span class="parameter-type">number</span><br>
+                            Order ID to verify
+                        </div>
+
+                        <h4>Example Request</h4>
+                        <div class="code-block">GET /api/payments/verify?orderId=123</div>
+
+                        <h4>Response</h4>
+                        <div class="code-block">{
+  "success": true,
+  "message": "Payment status retrieved",
+  "data": {
+    "order": {
+      "id": 123,
+      "paymentStatus": "paid",
+      "status": "confirmed",
+      "totalAmount": 3600
+    },
+    "paymentVerification": {
+      "payment_status_description": "COMPLETED",
+      "amount": 36.00,
+      "currency": "KES"
+    },
+    "trackingId": "pesapal-tracking-id"
+  }
+}</div>
+                    </div>
+                </div>
+
+                <!-- Get Transactions -->
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method get">GET</span>
+                        <span class="endpoint-url">/payments/transactions</span>
+                        <span class="endpoint-description">Get transaction history</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <h4>Query Parameters</h4>
+                        <div class="parameter">
+                            <span class="parameter-name">page</span> <span class="parameter-type">number</span><br>
+                            Page number
+                        </div>
+                        <div class="parameter">
+                            <span class="parameter-name">limit</span> <span class="parameter-type">number</span><br>
+                            Items per page
+                        </div>
+                        <div class="parameter">
+                            <span class="parameter-name">type</span> <span class="parameter-type">string</span><br>
+                            Transaction type (purchase, refund)
+                        </div>
+                        <div class="parameter">
+                            <span class="parameter-name">status</span> <span class="parameter-type">string</span><br>
+                            Transaction status (pending, paid, failed, refunded)
+                        </div>
+
+                        <h4>Response</h4>
+                        <div class="code-block">{
+  "success": true,
+  "data": {
+    "transactions": [
+      {
+        "id": 1,
+        "amount": 3600,
+        "type": "purchase",
+        "status": "paid",
+        "paymentMethod": "card",
+        "trackingId": "pesapal-tracking-id",
+        "createdAt": "2024-01-01T00:00:00.000Z",
+        "Order": {
+          "id": 123,
+          "totalAmount": 3600
+        }
+      }
+    ],
+    "pagination": {
+      "current": 1,
+      "total": 5,
+      "count": 25,
+      "perPage": 20
+    }
+  }
+}</div>
+                    </div>
+                </div>
+
+                <!-- Process Refund -->
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method post">POST</span>
+                        <span class="endpoint-url">/payments/refund</span>
+                        <span class="endpoint-description">Process refund (business only)</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <h4>Request Body</h4>
+                        <div class="parameter">
+                            <span class="parameter-name">transactionId</span> <span class="parameter-type">number</span> <span class="required">*required</span><br>
+                            Transaction ID to refund
+                        </div>
+                        <div class="parameter">
+                            <span class="parameter-name">amount</span> <span class="parameter-type">number</span> <span class="required">*required</span><br>
+                            Refund amount (cannot exceed original amount)
+                        </div>
+                        <div class="parameter">
+                            <span class="parameter-name">reason</span> <span class="parameter-type">string</span> <span class="required">*required</span><br>
+                            Refund reason
+                        </div>
+
+                        <h4>Example Request</h4>
+                        <div class="code-block">{
+  "transactionId": 123,
+  "amount": 3600,
+  "reason": "Customer requested refund due to order cancellation"
+}</div>
+
+                        <h4>Response</h4>
+                        <div class="code-block">{
+  "success": true,
+  "message": "Refund processed successfully",
+  "data": {
+    "refundTransaction": {
+      "id": 124,
+      "amount": -3600,
+      "reason": "Customer requested refund due to order cancellation",
+      "processedAt": "2024-01-01T00:00:00.000Z"
+    },
+    "originalTransaction": {
+      "id": 123,
+      "refundedAmount": 3600
+    }
+  }
+}</div>
+                    </div>
+                </div>
+
+                <!-- Payment Stats -->
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method get">GET</span>
+                        <span class="endpoint-url">/payments/stats</span>
+                        <span class="endpoint-description">Get payment statistics (business only)</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <h4>Query Parameters</h4>
+                        <div class="parameter">
+                            <span class="parameter-name">period</span> <span class="parameter-type">string</span><br>
+                            Time period: week, month, year (default: month)
+                        </div>
+
+                        <h4>Response</h4>
+                        <div class="code-block">{
+  "success": true,
+  "data": {
+    "totalRevenue": 180000,
+    "totalTransactions": 150,
+    "paidTransactions": 135,
+    "pendingTransactions": 10,
+    "refundedAmount": 7200,
+    "periodRevenue": 45000,
+    "period": "month",
+    "netRevenue": 172800
+  }
+}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Environment Setup Section -->
+        <div class="section" id="environment">
+            <div class="section-header">
+                <h2>⚙️ Environment Configuration</h2>
+            </div>
+            <div class="section-content">
+                <h3>Required Environment Variables</h3>
+                <div class="code-block"># Server Configuration
+PORT=3000
+NODE_ENV=development
+APP_URL=http://localhost:3000
+FRONTEND_URL=http://localhost:5173
+
+# Database Configuration
+DB_HOST=your_database_host
+DB_USER=your_database_user
+DB_PASSWORD=your_database_password
+DB_NAME=your_database_name
+
+# JWT Configuration (Generated secure keys)
+JWT_SECRET=c7170252883935859a823fefaed2df686840a55296ea243738809ba129660cdffa62886096f747c64d372bf228189c46ed25dd07c01e06de67ca94188a4d849d
+JWT_EXPIRE=15m
+JWT_REFRESH_SECRET=f20386948be0f85eab5bcc21b12ae74a67f721cce18c2a4e5260c2d2c0966961be79cbe6a1ae063dd42c70a89558446c5596bc177384ebe745285a1cca9e8d52
+JWT_REFRESH_EXPIRE=7d
+
+# Email Configuration
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USER=your_email@gmail.com
+EMAIL_PASS=your_app_password
+EMAIL_FROM=noreply@sokonet.com
+
+# DigitalOcean Spaces Configuration
+DO_SPACES_ENDPOINT=fra1.digitaloceanspaces.com
+DO_SPACES_KEY=your_spaces_key
+DO_SPACES_SECRET=your_spaces_secret
+DO_SPACES_BUCKET=your_bucket_name
+DO_SPACES_REGION=fra1
+
+# Pesapal Payment Configuration
+PESAPAL_CONSUMER_KEY=your_pesapal_consumer_key
+PESAPAL_CONSUMER_SECRET=your_pesapal_consumer_secret
+PESAPAL_BASE_URL=https://cybqa.pesapal.com/pesapalv3
+PESAPAL_CALLBACK_URL=http://localhost:3000/api/payments/callback
+PESAPAL_IPN_URL=http://localhost:3000/api/payments/ipn</div>
+
+                <h3>🚀 Quick Start</h3>
+                <div class="code-block"># Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+# Server will be running on http://localhost:3000
+# Health check: GET http://localhost:3000/health</div>
+
+                <h3>📝 Common Status Codes</h3>
+                <div class="status-codes">
+                    <div class="status-code status-200">200 OK - Success</div>
+                    <div class="status-code status-201">201 Created - Resource created</div>
+                    <div class="status-code status-400">400 Bad Request - Validation error</div>
+                    <div class="status-code status-401">401 Unauthorized - Invalid/missing token</div>
+                    <div class="status-code status-404">404 Not Found - Resource not found</div>
+                    <div class="status-code status-500">500 Internal Error - Server error</div>
+                </div>
+
+                <h3>🔐 Authentication Header</h3>
+                <p>For protected endpoints, include the JWT token in the Authorization header:</p>
+                <div class="code-block">Authorization: Bearer YOUR_JWT_TOKEN</div>
+
+                <h3>🏷️ User Roles</h3>
+                <ul>
+                    <li><strong>user</strong> - Regular customers who place orders</li>
+                    <li><strong>business</strong> - Restaurant owners who manage products and orders</li>
+                    <li><strong>admin</strong> - System administrators</li>
+                    <li><strong>dispatcher</strong> - Delivery management</li>
+                    <li><strong>scanner</strong> - QR code scanning for order verification</li>
+                </ul>
+
+                <h3>💡 Testing with Postman</h3>
+                <ol>
+                    <li>Register a business account using <code>POST /auth/register</code></li>
+                    <li>Login to get your JWT token using <code>POST /auth/login</code></li>
+                    <li>Set up Postman environment with your token</li>
+                    <li>Create categories and products</li>
+                    <li>Generate QR codes for customers</li>
+                    <li>Test the complete order flow</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="header" style="margin-top: 50px;">
+            <h2>🎉 Sokonet API is Ready!</h2>
+            <p>Complete restaurant management system with QR-based ordering, payment processing, and file management.</p>
+            <p><strong>Happy Coding!</strong> 🚀</p>
+        </div>
+    </div>
+</body>
+</html>
