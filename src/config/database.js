@@ -1,7 +1,13 @@
 const { Sequelize } = require('sequelize');
+const fs = require('fs');
+const path = require('path');
 require('dotenv').config();
 
-// Enhanced MySQL configuration with better error handling and connection options
+// Debug CA certificate loading
+const caCertPath = path.join(__dirname, '../../ca-certificate.crt');
+console.log('🔍 CA Certificate path:', caCertPath);
+console.log('🔍 CA Certificate exists:', fs.existsSync(caCertPath));
+
 const sequelize = new Sequelize(
   process.env.DB_NAME,
   process.env.DB_USER,
@@ -12,31 +18,24 @@ const sequelize = new Sequelize(
     dialect: 'mysql',
     logging: process.env.NODE_ENV === 'development' ? console.log : false,
     dialectOptions: {
-      ssl: process.env.NODE_ENV === 'production' ? {
-        require: true,
+      ssl: {
         rejectUnauthorized: false
-      } : false, // Disable SSL for development if it's causing issues
-      connectTimeout: 60000, // 60 seconds
-      acquireTimeout: 60000,
-      timeout: 60000,
-      // Add charset to prevent connection issues
+      },
+      connectTimeout: 120000, // 2 minutes
       charset: 'utf8mb4'
     },
     pool: {
       max: 5,
       min: 0,
-      acquire: 60000, // Increased from 30s to 60s
-      idle: 10000,
-      evict: 1000,
-      handleDisconnects: true
+      acquire: 100000, // Increased acquire timeout
+      idle: 30000,     // Increased idle timeout
+      // Remove 'evict' and 'handleDisconnects' - these cause warnings in mysql2
     },
     define: {
       timestamps: true,
-      underscored: false,
       charset: 'utf8mb4',
       collate: 'utf8mb4_unicode_ci'
     },
-    // Retry connection attempts
     retry: {
       match: [
         /ETIMEDOUT/,
@@ -50,6 +49,8 @@ const sequelize = new Sequelize(
         /SequelizeHostNotReachableError/,
         /SequelizeInvalidConnectionError/,
         /SequelizeConnectionTimedOutError/,
+        /SequelizeDatabaseError/,
+        /ER_LOCK_DEADLOCK/
       ],
       max: 3
     }
@@ -69,19 +70,28 @@ const connectDB = async () => {
       await sequelize.authenticate();
       console.log('✅ Database connected successfully');
 
+      // Safe database sync: No auto-alter to prevent deadlocks and excessive operations
       if (process.env.NODE_ENV === 'development') {
-        await sequelize.sync({ alter: true });
-        console.log('✅ Database synchronized');
+        try {
+          // Only sync without altering existing tables
+          await sequelize.sync({ force: false, alter: false });
+          console.log('✅ Database synchronized (safe mode - no table alterations)');
+          console.log('💡 Use `npm run migrate` for schema changes');
+        } catch (syncError) {
+          console.log('⚠️  Database sync skipped due to conflicts');
+          console.log('   Use migrations for schema changes instead');
+          console.log(`   Error: ${syncError.message}`);
+        }
       }
       
-      return; // Success, exit the retry loop
+      return;
       
     } catch (error) {
-      console.error(`❌ Database connection attempt failed:`, error.name);
+      console.error(`❌ Database connection failed:`, error.name);
       console.error(`   Message: ${error.message}`);
       
       if (error.original) {
-        console.error(`   Original error: ${error.original.code || error.original.message}`);
+        console.error(`   Error code: ${error.original.code || 'Unknown'}`);
       }
       
       retries--;
@@ -91,55 +101,19 @@ const connectDB = async () => {
         await new Promise(resolve => setTimeout(resolve, 5000));
       } else {
         console.error('\n❌ All database connection attempts failed.');
-        console.log('\n🔧 Troubleshooting steps:');
-        console.log('1. Check if your IP is whitelisted in DigitalOcean database settings');
-        console.log('2. Verify database credentials in .env file');
-        console.log('3. Test connection manually: run `node troubleshoot-db.js`');
-        console.log('4. Check if database server is running');
-        console.log('5. Try connecting without SSL first');
         
-        console.log('\nContinuing without database connection for development...');
-        
-        // Don't exit in development mode
         if (process.env.NODE_ENV === 'production') {
           console.error('Exiting in production mode due to database connection failure');
           process.exit(1);
+        } else {
+          console.log('Continuing without database sync for development...');
         }
       }
     }
   }
 };
 
-// Test database connection without Sequelize (for debugging)
-const testRawConnection = async () => {
-  const mysql = require('mysql2/promise');
-  
-  try {
-    const connection = await mysql.createConnection({
-      host: process.env.DB_HOST,
-      port: parseInt(process.env.DB_PORT),
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
-      ssl: false, // Test without SSL first
-      connectTimeout: 30000
-    });
-    
-    console.log('✅ Raw MySQL connection successful');
-    
-    const [rows] = await connection.execute('SELECT 1 as test');
-    console.log('✅ Query test successful');
-    
-    await connection.end();
-    return true;
-  } catch (error) {
-    console.error('❌ Raw MySQL connection failed:', error.message);
-    return false;
-  }
-};
-
 module.exports = { 
   sequelize, 
-  connectDB, 
-  testRawConnection 
+  connectDB
 };
